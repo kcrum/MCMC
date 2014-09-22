@@ -21,7 +21,7 @@ class grid_2d_cities():
         if len(args) > 2:
             self.ylength = int(np.ceil(args[2]))
 
-        self.xarray, self.yarray = [], []
+        self.coords = []
         self.generateCities()    
 
     # Put ncities on a [0, xlength-1] x [0, ylength-1] integer grid.
@@ -34,20 +34,23 @@ class grid_2d_cities():
                 xval = int(np.floor(np.random.uniform(0,self.xlength)))
                 yval = int(np.floor(np.random.uniform(0,self.ylength)))
                 # Enure point is unique
-                if xval in self.xarray and yval in self.yarray:
-                    while xval in self.xarray and yval in self.yarray:
+                if (xval,yval) in self.coords:
+                    while (xval,yval) in self.coords:
                         xval = int(np.floor(np.random.uniform(0,self.xlength)))
                         yval = int(np.floor(np.random.uniform(0,self.ylength)))
+                # Add point to coordinate array
+                self.coords.append((xval,yval))
 
-                self.xarray.append(xval)
-                self.yarray.append(yval)
-
+    # Draw cities as they appear on the grid.
     def drawCities(self):
         fig = plt.figure()
         ax = fig.gca()
         ax.set_xticks(np.arange(-1, self.xlength))        
         ax.set_yticks(np.arange(-1, self.ylength))
-        plt.scatter(self.xarray, self.yarray)
+        # Unpack coordinate pairs
+        xarr, yarr = zip(*self.coords)
+        # Plot coordinates
+        plt.scatter(xarr, yarr)
         plt.xlim(-0.5, self.xlength-0.5)
         plt.ylim(-0.5, self.ylength-0.5)
         # Add rectangle
