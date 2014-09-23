@@ -1,4 +1,4 @@
-import sys
+import itertools, sys
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
@@ -58,3 +58,21 @@ class grid_2d_cities():
                                alpha=0.3, color='gray')) 
         plt.grid()
         plt.show()
+
+    # Calculate the distance between cities at ind1 and ind2 of the coordinate
+    # array.
+    def distance(self, ind1, ind2):
+        if ind1 >= self.ncities or ind2 >= self.ncities:
+            print 'Indices must integers be less than', self.ncities
+        else: 
+            return np.sqrt( (self.coords[ind1][0]-self.coords[ind2][0])**2 +
+                            (self.coords[ind1][1]-self.coords[ind2][1])**2 )
+
+    # Brute force shortest route
+    def bruteShortest(self):
+        if self.ncities > 7:
+            print 'There are too many cities to find a solution by brute force.'
+            print 'ncities = %s, which means %s possible paths.' %\
+                (self.ncities, np.math.factorial(self.ncities-1))
+        else:
+            print 'Put brute force algorithm here.'
