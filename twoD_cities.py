@@ -173,3 +173,8 @@ class grid_2d_cities():
             print 'Shortest path: '            
             print self.bruteshortest
             print 'has length =', mindist
+
+if __name__ == '__main__':
+    mycities = grid_2d_cities(8,12,12)
+    mycities.bruteShortest()
+    mycities.drawCities()
