@@ -74,8 +74,13 @@ class grid_2d_cities():
                 # Add point to coordinate array
                 self.coords.append((xval,yval))
 
-    # Draw cities as they appear on the grid.
-    def drawCities(self):
+    # Draw cities as they appear on the grid. If a route is passed, this will be 
+    # drawn as a collection of arrows linking the cities.
+    def drawCities(self, route = []):
+        # If no route was passed (and bruteshortest has been found), add arrows
+        # showing bruteshortest path.
+        if not route and self.bruteshortest:
+            route = self.bruteshortest
         fig = plt.figure()
         ax = fig.gca()
         ax.set_xticks(np.arange(-1, self.xlength))        
@@ -90,16 +95,19 @@ class grid_2d_cities():
         ax.add_patch(Rectangle((0,0),self.xlength-1,self.ylength-1,
                                alpha=0.3, color='gray')) 
         plt.grid()
-        if self.bruteshortest:
-            self.addArrows(ax)
+        # Add arrows for a route, if route exists
+        if route:
+            self.addArrows(ax, route)
         plt.show()
 
-    # If shortest path known, add arrows to plot
-    def addArrows(self, ax):
-        # Start at last point in self.bruteshortest so the arrows wrap all the 
-        # way around.
-        prevpt = self.bruteshortest[-1]
-        for pt in self.bruteshortest:
+    # Add arrows to plot showing the specified route. This function does the 
+    # array wrap-around for you, so no need to manually append route[0] to the 
+    # back end of the route.
+    def addArrows(self, ax, route):
+        print "Route length:", routeLength(route)
+        # Start at last point in route so the arrows wrap all the way around.
+        prevpt = route[-1]
+        for pt in route:
             dx, dy = pt[0]-prevpt[0], pt[1]-prevpt[1]
             scale = 1 - 0.3/np.sqrt(dx**2 + dy**2)
             ax.arrow(prevpt[0], prevpt[1], scale*dx, scale*dy,
