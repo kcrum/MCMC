@@ -29,10 +29,16 @@ def routeLength(arr):
 
     return totaldist
 
+###############################################################################
 # Put cities on random integer vertices of [0, ncities-1] x [0, ncities-1] grid
 # by default. You may also pass xlength and ylength
 # Each city has a unique vertex.
+###############################################################################
 class grid_2d_cities():
+    # If there are more than 9 cities, the brute force algorithm becomes too 
+    # slow. For n cities, we search (n-1)! routes.
+    maxbruten = 9
+
     def __init__(self, *args):
         if len(args) == 0:
             print 'Must pass at least one integer to constructor. Exiting.'
@@ -84,7 +90,21 @@ class grid_2d_cities():
         ax.add_patch(Rectangle((0,0),self.xlength-1,self.ylength-1,
                                alpha=0.3, color='gray')) 
         plt.grid()
+        if self.bruteshortest:
+            self.addArrows(ax)
         plt.show()
+
+    # If shortest path known, add arrows to plot
+    def addArrows(self, ax):
+        # Start at last point in self.bruteshortest so the arrows wrap all the 
+        # way around.
+        prevpt = self.bruteshortest[-1]
+        for pt in self.bruteshortest:
+            dx, dy = pt[0]-prevpt[0], pt[1]-prevpt[1]
+            scale = 1 - 0.3/np.sqrt(dx**2 + dy**2)
+            ax.arrow(prevpt[0], prevpt[1], scale*dx, scale*dy,
+                     head_width=0.1)
+            prevpt = pt
 
     # Calculate the distance between cities at ind1 and ind2 of the coordinate
     # array.
@@ -96,24 +116,25 @@ class grid_2d_cities():
                             (self.coords[ind1][1]-self.coords[ind2][1])**2 )
         
     # Brute force shortest route
+    #
+    # We are only interested in unique routes, i.e. the same path with a
+    # different starting point or directionality (clockwise vs. 
+    # counterclockwise) should not be considered. For example there are 6
+    # different permutations for three cities, but each of these 6 
+    # permutations has the same total distance. 
+    #
+    # To reduce redundacy, for n cities labeled 0 to n-1, we demand that
+    # city 0 be the starting point. There are still a factor of 2 too 
+    # many routes, as reversals lead to identical distances (e.g. for 5 
+    # cities labeled 0 to 4, [0,1,2,3,4] has the same distance as 
+    # [0,4,3,2,1]). 
+    #
     def bruteShortest(self):
-        if self.ncities > 7:
+        if self.ncities > grid_2d_cities.maxbruten:
             print 'There are too many cities to find a solution by brute force.'
             print 'ncities = %s, which means %s possible paths.' %\
                 (self.ncities, np.math.factorial(self.ncities-1))            
         else:
-            # We are only interested in unique routes, i.e. the same path with a
-            # different starting point or directionality (clockwise vs. 
-            # counterclockwise) should not be considered. For example there are 6
-            # different permutations for three cities, but each of these 6 
-            # permutations has the same total distance. 
-            #
-            # To reduce redundacy, for n cities labeled 0 to n-1, we demand that
-            # city 0 be the starting point. There are still a factor of 2 too 
-            # many routes, as reversals lead to identical distances (e.g. for 5 
-            # cities labeled 0 to 4, [0,1,2,3,4] has the same distance as 
-            # [0,4,3,2,1]). 
-            #
             mindist = -1
             mindistindices = []
             # Loop over all permutations of {1,...,ncities-1}
@@ -140,6 +161,7 @@ class grid_2d_cities():
                     mindist = newdist
                     mindistindices = indices
                     
-            print 'Shortest path: '
-            print [self.coords[ind] for ind in mindistindices]
+            self.bruteshortest = [self.coords[ind] for ind in mindistindices]
+            print 'Shortest path: '            
+            print self.bruteshortest
             print 'has length =', mindist
