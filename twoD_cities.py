@@ -4,6 +4,30 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 np.random.seed(3)
+debug = False
+
+# Generic Euclidean distance function
+def distance(coord1, coord2):
+    if len(coord1) != len(coord2):
+        print 'Coordinates must be of same dimension. Returning 0.'
+        return 0
+    diffsq = [(el[0] - el[1])**2 for el in zip(coord1,coord2)]
+    return np.sqrt(np.array(diffsq).sum())
+
+# Calculate distance of array in order, connecting final element to first 
+# element.
+def routeLength(arr):
+    if len(arr) <= 1:
+        print 'Array too short. Exiting with route length = 0.'
+        return 0
+
+    totaldist = 0 
+    prevelem = arr[-1]
+    for elem in arr:
+        totaldist += distance(prevelem, elem)
+        prevelem = elem
+
+    return totaldist
 
 # Put cities on random integer vertices of [0, ncities-1] x [0, ncities-1] grid
 # by default. You may also pass xlength and ylength
@@ -21,7 +45,10 @@ class grid_2d_cities():
         if len(args) > 2:
             self.ylength = int(np.ceil(args[2]))
 
+        # Array to store coordinate pairs
         self.coords = []
+        # Array to store brute force shortest route
+        self.bruteshortest = []
         self.generateCities()    
 
     # Put ncities on a [0, xlength-1] x [0, ylength-1] integer grid.
@@ -61,18 +88,58 @@ class grid_2d_cities():
 
     # Calculate the distance between cities at ind1 and ind2 of the coordinate
     # array.
-    def distance(self, ind1, ind2):
+    def cityDistance(self, ind1, ind2):
         if ind1 >= self.ncities or ind2 >= self.ncities:
             print 'Indices must integers be less than', self.ncities
         else: 
             return np.sqrt( (self.coords[ind1][0]-self.coords[ind2][0])**2 +
                             (self.coords[ind1][1]-self.coords[ind2][1])**2 )
-
+        
     # Brute force shortest route
     def bruteShortest(self):
         if self.ncities > 7:
             print 'There are too many cities to find a solution by brute force.'
             print 'ncities = %s, which means %s possible paths.' %\
-                (self.ncities, np.math.factorial(self.ncities-1))
+                (self.ncities, np.math.factorial(self.ncities-1))            
         else:
-            print 'Put brute force algorithm here.'
+            # We are only interested in unique routes, i.e. the same path with a
+            # different starting point or directionality (clockwise vs. 
+            # counterclockwise) should not be considered. For example there are 6
+            # different permutations for three cities, but each of these 6 
+            # permutations has the same total distance. 
+            #
+            # To reduce redundacy, for n cities labeled 0 to n-1, we demand that
+            # city 0 be the starting point. There are still a factor of 2 too 
+            # many routes, as reversals lead to identical distances (e.g. for 5 
+            # cities labeled 0 to 4, [0,1,2,3,4] has the same distance as 
+            # [0,4,3,2,1]). 
+            #
+            mindist = -1
+            mindistindices = []
+            # Loop over all permutations of {1,...,ncities-1}
+            for perm in itertools.permutations(range(1,self.ncities)):
+                # Store each permutation of indices in an array.
+                indices = [ind for ind in perm]
+                # Don't forget to add starting point (front OR back is fine)
+                indices.append(0)
+                newroute = [self.coords[ind] for ind in indices]
+                newdist = routeLength(newroute)
+
+                # This is for debugging. 
+                if debug: print 'indices: ', indices
+
+                # This is for debugging. 
+                if debug and newdist == mindist:
+                    print 'Redundant minimum routes:'
+                    print mindistindices, ' and '
+                    print indices
+
+                # If (shorter path) or (first iteration) (i.e. when 
+                # mindistindices is empty; this will be minimum no matter what.)
+                if newdist < mindist or not mindistindices:                    
+                    mindist = newdist
+                    mindistindices = indices
+                    
+            print 'Shortest path: '
+            print [self.coords[ind] for ind in mindistindices]
+            print 'has length =', mindist
