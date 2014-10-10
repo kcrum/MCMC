@@ -3,20 +3,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
-np.random.seed(3)
+
+randomseed = 9
+np.random.seed(randomseed)
 debug = False
 
-# Generic Euclidean distance function
 def distance(coord1, coord2):
+    """
+    Generic n-dimensional Euclidean distance function.
+    """
     if len(coord1) != len(coord2):
         print 'Coordinates must be of same dimension. Returning 0.'
         return 0
     diffsq = [(el[0] - el[1])**2 for el in zip(coord1,coord2)]
     return np.sqrt(np.array(diffsq).sum())
 
-# Calculate distance of array in order, connecting final element to first 
-# element.
 def routeLength(arr):
+    """
+    Calculate distance of array in order, connecting final element to first 
+    element.
+    """
     if len(arr) <= 1:
         print 'Array too short. Exiting with route length = 0.'
         return 0
@@ -30,11 +36,14 @@ def routeLength(arr):
     return totaldist
 
 ###############################################################################
-# Put cities on random integer vertices of [0, ncities-1] x [0, ncities-1] grid
-# by default. You may also pass xlength and ylength
-# Each city has a unique vertex.
 ###############################################################################
 class grid_2d_cities():
+    """
+    Put cities on random integer vertices of [0, ncities-1] x [0, ncities-1] 
+    grid by default. You may also pass xlength and ylength. Each city has a
+    unique vertex.
+    """
+
     # If there are more than 9 cities, the brute force algorithm becomes too 
     # slow. For n cities, we search (n-1)! routes.
     maxbruten = 9
@@ -57,8 +66,10 @@ class grid_2d_cities():
         self.bruteshortest = []
         self.generateCities()    
 
-    # Put ncities on a [0, xlength-1] x [0, ylength-1] integer grid.
     def generateCities(self):
+        """
+        Put ncities on a [0, xlength-1] x [0, ylength-1] integer grid.
+        """
         if self.ncities > self.xlength*self.ylength:
             print 'The product xlength*ylength must be greather than ncities.'
             print 'Cities won\'t generate until this happens.'
@@ -74,9 +85,12 @@ class grid_2d_cities():
                 # Add point to coordinate array
                 self.coords.append((xval,yval))
 
-    # Draw cities as they appear on the grid. If a route is passed, this will be 
-    # drawn as a collection of arrows linking the cities.
+
     def drawCities(self, route = []):
+        """
+        Draw cities as they appear on the grid. If a route is passed, this will
+        be drawn as a collection of arrows linking the cities.
+        """
         # If no route was passed (and bruteshortest has been found), add arrows
         # showing bruteshortest path.
         if not route and self.bruteshortest:
@@ -100,10 +114,12 @@ class grid_2d_cities():
             self.addArrows(ax, route)
         plt.show()
 
-    # Add arrows to plot showing the specified route. This function does the 
-    # array wrap-around for you, so no need to manually append route[0] to the 
-    # back end of the route.
     def addArrows(self, ax, route):
+        """
+        Add arrows to plot showing the specified route. This function does the 
+        array wrap-around for you, so no need to manually add route[0] to both
+        the front end and the back end of the route.
+        """
         print "Route length:", routeLength(route)
         # Start at last point in route so the arrows wrap all the way around.
         prevpt = route[-1]
@@ -114,9 +130,11 @@ class grid_2d_cities():
                      head_width=0.1)
             prevpt = pt
 
-    # Calculate the distance between cities at ind1 and ind2 of the coordinate
-    # array.
     def cityDistance(self, ind1, ind2):
+        """
+        Calculate the distance between cities at ind1 and ind2 of the 
+        coordinate array.
+        """
         if ind1 >= self.ncities or ind2 >= self.ncities:
             print 'Indices must integers be less than', self.ncities
         else: 
@@ -124,22 +142,22 @@ class grid_2d_cities():
                             (self.coords[ind1][1]-self.coords[ind2][1])**2 )
         
     # Brute force shortest route
-    #
-    # We are only interested in unique routes, i.e. the same path with a
-    # different starting point or directionality (clockwise vs. 
-    # counterclockwise) should not be considered. For example there are 6
-    # different permutations for three cities, but each of these 6 
-    # permutations has the same total distance. 
-    #
-    # To reduce redundacy, for n cities labeled 0 to n-1, we demand that
-    # city 0 be the starting point. There are still a factor of 2 too 
-    # many routes, as reversals lead to identical distances (e.g. for 5 
-    # cities labeled 0 to 4, [0,1,2,3,4] has the same distance as 
-    # [0,4,3,2,1]). 
-    #
     def bruteShortest(self):
+        """
+        We are only interested in unique routes, i.e. the same path with a
+        different starting point or directionality (clockwise vs. 
+        counterclockwise) should not be considered. For example there are 6
+        different permutations for three cities, but each of these 6 
+        permutations has the same total distance. 
+        
+        To reduce redundacy, for n cities labeled 0 to n-1, we demand that
+        city 0 be the starting point. There are still a factor of 2 too 
+        many routes, as reversals lead to identical distances (e.g. for 5 
+        cities labeled 0 to 4, [0,1,2,3,4] has the same distance as 
+        [0,4,3,2,1]). 
+        """
         if self.ncities > grid_2d_cities.maxbruten:
-            print 'There are too many cities to find a solution by brute force.'
+            print 'There are too many cities to find a brute force solution.'
             print 'ncities = %s, which means %s possible paths.' %\
                 (self.ncities, np.math.factorial(self.ncities-1))            
         else:
@@ -164,15 +182,14 @@ class grid_2d_cities():
                     print indices
 
                 # If (shorter path) or (first iteration) (i.e. when 
-                # mindistindices is empty; this will be minimum no matter what.)
+                # mindistindices is empty; this will be minimum no matter 
+                # what.)
                 if newdist < mindist or not mindistindices:                    
                     mindist = newdist
                     mindistindices = indices
                     
             self.bruteshortest = [self.coords[ind] for ind in mindistindices]
-            print 'Shortest path: '            
-            print self.bruteshortest
-            print 'has length =', mindist
+            print 'Brute force solution has length: ', mindist
 
 if __name__ == '__main__':
     mycities = grid_2d_cities(8,12,12)
