@@ -106,9 +106,12 @@ def runAnnealing(cities, starttemp = 1e4, endtemp = 1, coolrate = 0.003):
 def main(cities):
     simAnnSoln,energyarr, temparr = runAnnealing(cities,100,0.01)
 
-    print '-'*30 + 'Brute force' + '-'*30
-    cities.bruteShortest()
-    cities.drawCities()
+    # Brute force solution won't be computed if ncities > maxBruteN.
+    if cities.ncities <= tdc.grid_2d_cities.maxBruteN:
+        print '-'*30 + 'Brute force' + '-'*30
+        cities.bruteShortest()
+        cities.drawCities()
+
     print '-'*26 + 'Simulated Annealing' + '-'*26
     print 'Lowest energy: ', energyarr[-1], ' Number of iterations: ', \
         len(energyarr)
@@ -120,6 +123,6 @@ def main(cities):
 
 if __name__ == '__main__':
     # Put 8 cities on a 12 x 12 grid
-    cities = tdc.grid_2d_cities(8,12,12)
+    cities = tdc.grid_2d_cities(20,12,12)
     
     main(cities)

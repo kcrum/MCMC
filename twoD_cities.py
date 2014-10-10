@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 
-randomseed = 9
+randomseed = 1
 np.random.seed(randomseed)
 debug = False
 
@@ -46,7 +46,7 @@ class grid_2d_cities():
 
     # If there are more than 9 cities, the brute force algorithm becomes too 
     # slow. For n cities, we search (n-1)! routes.
-    maxbruten = 9
+    maxBruteN = 9
 
     def __init__(self, *args):
         if len(args) == 0:
@@ -156,7 +156,7 @@ class grid_2d_cities():
         cities labeled 0 to 4, [0,1,2,3,4] has the same distance as 
         [0,4,3,2,1]). 
         """
-        if self.ncities > grid_2d_cities.maxbruten:
+        if self.ncities > grid_2d_cities.maxBruteN:
             print 'There are too many cities to find a brute force solution.'
             print 'ncities = %s, which means %s possible paths.' %\
                 (self.ncities, np.math.factorial(self.ncities-1))            
