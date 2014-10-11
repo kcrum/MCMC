@@ -9,6 +9,15 @@ import twoD_cities as tdc
 #    http://www.theprojectspot.com/tutorial-post/applying-a-genetic-algorithm-to-the-travelling-salesman-problem/5
 #
 
+def align_yaxis(ax1, v1, ax2, v2):
+    """adjust ax2 ylimit so that v2 in ax2 is aligned to v1 in ax1"""
+    _, y1 = ax1.transData.transform((0, v1))
+    _, y2 = ax2.transData.transform((0, v2))
+    inv = ax2.transData.inverted()
+    _, dy = inv.transform((0, 0)) - inv.transform((0, y1-y2))
+    miny, maxy = ax2.get_ylim()
+    ax2.set_ylim(miny+dy, maxy+dy)
+
 def getEnergy(cities, indices):
     """
     Transform indices to coordinates, then find route length.
@@ -115,14 +124,26 @@ def main(cities):
     print '-'*26 + 'Simulated Annealing' + '-'*26
     print 'Lowest energy: ', energyarr[-1], ' Number of iterations: ', \
         len(energyarr)
-    cities.drawCities( [cities.coords[ind] for ind in simAnnSoln+[0]] )
-    plt.plot(energyarr)
-    plt.ylabel('Total distance of route')
-    plt.xlabel('Iterations')
+    cities.drawCities( [cities.coords[ind] for ind in [0]+simAnnSoln] )
+
+    # Plot energy and temperature together
+    fig, ax1 = plt.subplots()
+    ax1.plot(energyarr)
+    ax1.set_ylabel('Total distance of route')
+    ax1.set_xlabel('Iterations')
+
+    ax2 = ax1.twinx()
+    ax2.plot(temparr, color='red')
+    ax2.set_ylabel('Temperature',color='red')
+    for tk in ax2.get_yticklabels():
+        tk.set_color('red')
+
+    align_yaxis(ax1, min(energyarr), ax2, min(temparr))
+    ax2.set_xlim([0, len(energyarr)])
     plt.show()
 
 if __name__ == '__main__':
-    # Put 8 cities on a 12 x 12 grid
-    cities = tdc.grid_2d_cities(20,12,12)
+    # Put 8 cities on a 15 x 15 grid
+    cities = tdc.grid_2d_cities(8,15,15)
     
     main(cities)

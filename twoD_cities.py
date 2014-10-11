@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 
-randomseed = 1
+randomseed = 3
 np.random.seed(randomseed)
 debug = False
 
@@ -102,7 +102,8 @@ class grid_2d_cities():
         # Unpack coordinate pairs
         xarr, yarr = zip(*self.coords)
         # Plot coordinates
-        plt.scatter(xarr, yarr)
+        plt.scatter(xarr[1:], yarr[1:], marker='o')
+        plt.scatter(xarr[0], yarr[0], s=30, c='r', marker='D')        
         plt.xlim(-0.5, self.xlength-0.5)
         plt.ylim(-0.5, self.ylength-0.5)
         # Add rectangle
