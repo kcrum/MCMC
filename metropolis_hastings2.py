@@ -1,8 +1,8 @@
-# Metropolis-Hastings algorithm is an MCMC process that allows you to estimate a
-# PDF P(x) if you have some function f(x) which is proportional to P(x). You need
-# to also choose a proposal density Q(y|z). If Q(y|z) is symmtric, i.e.
-# Q(y|z) =  Q(z|y), then we have just the Metropolis algorithm (a special case of
-# M.-H. algorithm).
+# Metropolis-Hastings algorithm is an MCMC process that allows you to estimate 
+# a PDF P(x) if you have some function f(x) which is proportional to P(x). You 
+# need to also choose a proposal density Q(y|z). If Q(y|z) is symmtric, i.e.
+# Q(y|z) =  Q(z|y), then we have just the Metropolis algorithm (a special case 
+# of M.-H. algorithm).
 #
 # The algorithm starts when some initial x0 is chosen. We then draw x' from 
 # Q(x'|x0). Calculate r1 = f(x')/f(x0) and r2 = Q(x0|x')/Q(x'|x0). Note that if
@@ -10,9 +10,9 @@
 #   1) If r1*r2 >= 1, then x1 = x'. 
 #   2) Otherwise, x1 = x' with probability r1*r2, and x1 = x0 with probability
 #      1-r1*r2.
-# Repeat the above for x1. We do this for many iterations (burn-in), then discard
-# the values. We continue from the last burn-in point, taking all accepted values
-# as a sample of P(x).
+# Repeat the above for x1. We do this for many iterations (burn-in), then 
+# discard the values. We continue from the last burn-in point, taking all 
+# accepted values as a sample of P(x).
 #
 # Often a Gaussian N(x;y,sigma) is chosen for Q. Note that N(z;y,s) = N(y;z,s).
 # The proposal density most efficiently proposes values when P~Q. 
@@ -33,7 +33,7 @@ startx = 0.
 # We can use an improperly normalized Gaussian as our distribution f(x)
 dist = lambda x: np.exp( -(x - mean)**2/(2.*sigma**2) )
 
-# This is a messier, bimodal-looking distribution. We'll set it to zero outside 
+# This is a messier, bimodal-looking distribution. We'll set it to zero outside
 # of its two real roots.
 fnc2 = lambda x: -(x)**4 - 3*(x)**3 + 5    
 root1, root2 = sciop.brentq(fnc2, -4, -2), sciop.brentq(fnc2, -2, 2) 
