@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
-
-randomseed = 3
-np.random.seed(randomseed)
 debug = False
+
+def setseed(randomseed=3):
+    np.random.seed(randomseed)
 
 def distance(coord1, coord2):
     """
@@ -193,6 +193,7 @@ class grid_2d_cities():
             print 'Brute force solution has length: ', mindist
 
 if __name__ == '__main__':
+    setseed()
     mycities = grid_2d_cities(8,12,12)
     mycities.bruteShortest()
     mycities.drawCities()

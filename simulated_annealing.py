@@ -1,4 +1,4 @@
-import copy
+import copy, sys
 import numpy as np
 import scipy.stats as st
 import matplotlib.pyplot as plt
@@ -143,7 +143,12 @@ def main(cities):
     plt.show()
 
 if __name__ == '__main__':
-    # Put 8 cities on a 15 x 15 grid
+    # Seed the random number generator
+    if len(sys.argv) > 1:
+        tdc.setseed(int(sys.argv[1]))
+    else:        
+        tdc.setseed(7)
+    # Put 8 cities on a 15 x 15 grid    
     cities = tdc.grid_2d_cities(8,15,15)
     
     main(cities)
