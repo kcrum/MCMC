@@ -84,8 +84,9 @@ def runAnnealing(cities, starttemp = 1e4, endtemp = 1, coolrate = 0.003):
     currentE = getEnergy(cities, currentsoln)
     print 'Starting distance: ', currentE
     
-    #currentsoln.append(0)
-    #cities.drawCities( [cities.coords[ind] for ind in currentsoln] )
+    # Save best solution found at any point, in case you don't end on it
+    bestE = currentE
+    bestsoln = currentsoln
 
     # Create lists and temperature for annealing loop
     energyarr, temparr = [], []
@@ -106,11 +107,15 @@ def runAnnealing(cities, starttemp = 1e4, endtemp = 1, coolrate = 0.003):
         temparr.append(temp)
         energyarr.append(currentE)
 
+        # If current solution is best yet, save it.
+        if currentE < bestE:
+            bestsoln = currentsoln
+            bestE = currentE
+
         # Lower the temperature
         temp *= 1 - coolrate
 
-    # currentsoln should now approximately hold the best route.
-    return currentsoln, energyarr, temparr
+    return bestsoln, energyarr, temparr
 
 def main(cities):
     simAnnSoln,energyarr, temparr = runAnnealing(cities,100,0.01)
@@ -122,7 +127,7 @@ def main(cities):
         cities.drawCities()
 
     print '-'*26 + 'Simulated Annealing' + '-'*26
-    print 'Lowest energy: ', energyarr[-1], ' Number of iterations: ', \
+    print 'Lowest energy: ', min(energyarr), ' Number of iterations: ', \
         len(energyarr)
     cities.drawCities( [cities.coords[ind] for ind in [0]+simAnnSoln] )
 
