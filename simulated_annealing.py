@@ -1,4 +1,6 @@
-import copy, sys
+import sys
+import time
+import copy
 import numpy as np
 import scipy.stats as st
 import matplotlib.pyplot as plt
@@ -82,7 +84,7 @@ def runAnnealing(cities, starttemp = 1e4, endtemp = 1, coolrate = 0.003):
 
     # Find the length (a.k.a. energy) of this first solution. 
     currentE = getEnergy(cities, currentsoln)
-    print 'Starting distance: ', currentE
+    print 'Starting distance: %.3f' % currentE
     
     # Save best solution found at any point, in case you don't end on it
     bestE = currentE
@@ -118,17 +120,23 @@ def runAnnealing(cities, starttemp = 1e4, endtemp = 1, coolrate = 0.003):
     return bestsoln, energyarr, temparr
 
 def main(cities):
+    startSA = time.time()
     simAnnSoln,energyarr, temparr = runAnnealing(cities,100,0.01)
-
+    timeSA = time.time() - startSA
+    
     # Brute force solution won't be computed if ncities > maxBruteN.
     if cities.ncities <= tdc.grid_2d_cities.maxBruteN:
         print '-'*30 + 'Brute force' + '-'*30
+        startBF = time.time()
         cities.bruteShortest()
+        timeBF = time.time() - startBF
+        print 'Brute force total time: %.2f s' % timeBF
         cities.drawCities()
 
     print '-'*26 + 'Simulated Annealing' + '-'*26
-    print 'Lowest energy: ', min(energyarr), ' Number of iterations: ', \
-        len(energyarr)
+    print 'Lowest energy: %.3f  Number of iterations: %.3f' % (min(energyarr),
+                                                               len(energyarr))
+    print 'Simulated annealing total time: %.2f s' % timeSA
     cities.drawCities( [cities.coords[ind] for ind in [0]+simAnnSoln] )
 
     # Plot energy and temperature together
@@ -153,7 +161,7 @@ if __name__ == '__main__':
         tdc.setseed(int(sys.argv[1]))
     else:        
         tdc.setseed(7)
-    # Put 8 cities on a 15 x 15 grid    
-    cities = tdc.grid_2d_cities(8,15,15)
+    # Put 9 cities on a 15 x 15 grid    
+    cities = tdc.grid_2d_cities(9,15,15)
     
     main(cities)

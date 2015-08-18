@@ -121,7 +121,7 @@ class grid_2d_cities():
         array wrap-around for you, so no need to manually add route[0] to both
         the front end and the back end of the route.
         """
-        print "Route length:", routeLength(route)
+        print "Route length: %.3f" % routeLength(route)
         # Start at last point in route so the arrows wrap all the way around.
         prevpt = route[-1]
         for pt in route:
@@ -190,7 +190,7 @@ class grid_2d_cities():
                     mindistindices = indices
                     
             self.bruteshortest = [self.coords[ind] for ind in mindistindices]
-            print 'Brute force solution has length: ', mindist
+            print 'Brute force solution has length: %.3f' % mindist
 
 if __name__ == '__main__':
     setseed()
