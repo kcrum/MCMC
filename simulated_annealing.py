@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import twoD_cities as tdc
 
 #
-# Perhaps try genetic algorithm next? See: 
+# Perhaps try genetic algorithm next? See:
 #    http://www.theprojectspot.com/tutorial-post/applying-a-genetic-algorithm-to-the-travelling-salesman-problem/5
 #
 
@@ -24,10 +24,12 @@ def getEnergy(cities, indices):
     """
     Transform indices to coordinates, then find route length.
     """
-    # The tdc.routeLength() function expects an array of coordinates, not an 
-    # array of indices. Also don't forget to add starting point (front OR back 
+    # The tdc.routeLength() function expects an array of coordinates, not an
+    # array of indices. Also don't forget to add starting point (front OR back
     # is fine).
-    route = [cities.coords[ind] for ind in indices + [0]]
+    all_inds = [i for i in indices]
+    all_inds.append(0)
+    route = [cities.coords[ind] for ind in all_inds]
     return tdc.routeLength(route)
 
 
@@ -39,7 +41,7 @@ def getNeighbor(currentsoln):
     # Make deep copy of current solution to fill
     neighborsoln = copy.deepcopy(currentsoln)
     # Get indices of cities to swap.
-    indA, indB =  np.random.choice(range(len(currentsoln)), size=2, 
+    indA, indB =  np.random.choice(range(len(currentsoln)), size=2,
                                    replace=False)
     # Swap values
     newA, newB = neighborsoln[indB], neighborsoln[indA]
@@ -70,7 +72,7 @@ def runAnnealing(cities, starttemp = 1e4, endtemp = 1, coolrate = 0.003):
       1) Select a neighbor solution by making a small change to current soln.
       2) Draw from acceptance PDF to determine whether to move to neighbor.
       3) Decrease temperature and continue looping.
-    Neighbor solutions are found by taking two random cities on the current 
+    Neighbor solutions are found by taking two random cities on the current
     solution and swapping them. We use total solution length as our "energy" E
     here. Our acceptance PDF is
        P_move = exp( (E_current - E_neighbor)/temp )
@@ -78,14 +80,14 @@ def runAnnealing(cities, starttemp = 1e4, endtemp = 1, coolrate = 0.003):
     accept neighbor with prob = 1. Otherwise switch to neighbor solution with
     probability P_move.
     """
-    # To save ourselves a little work, we'll fix city 0 as our starting and 
+    # To save ourselves a little work, we'll fix city 0 as our starting and
     # ending point. We therefore only look at cities {1,...,ncities-1}.
-    currentsoln = range(1,cities.ncities)
+    currentsoln = [i for i in range(1,cities.ncities)]
 
-    # Find the length (a.k.a. energy) of this first solution. 
+    # Find the length (a.k.a. energy) of this first solution.
     currentE = getEnergy(cities, currentsoln)
-    print 'Starting distance: %.3f' % currentE
-    
+    print('Starting distance: %.3f' % currentE)
+
     # Save best solution found at any point, in case you don't end on it
     bestE = currentE
     bestsoln = currentsoln
@@ -123,20 +125,20 @@ def main(cities):
     startSA = time.time()
     simAnnSoln,energyarr, temparr = runAnnealing(cities,100,0.01)
     timeSA = time.time() - startSA
-    
+
     # Brute force solution won't be computed if ncities > maxBruteN.
     if cities.ncities <= tdc.grid_2d_cities.maxBruteN:
-        print '-'*30 + 'Brute force' + '-'*30
+        print('-'*30 + 'Brute force' + '-'*30)
         startBF = time.time()
         cities.bruteShortest()
         timeBF = time.time() - startBF
-        print 'Brute force total time: %.2f s' % timeBF
+        print('Brute force total time: %.2f s' % timeBF)
         cities.drawCities()
 
-    print '-'*26 + 'Simulated Annealing' + '-'*26
-    print 'Lowest energy: %.3f  Number of iterations: %.3f' % (min(energyarr),
-                                                               len(energyarr))
-    print 'Simulated annealing total time: %.2f s' % timeSA
+    print('-'*26 + 'Simulated Annealing' + '-'*26)
+    print('Lowest energy: %.3f  Number of iterations: %.3f' % (min(energyarr),
+                                                               len(energyarr)))
+    print('Simulated annealing total time: %.2f s' % timeSA)
     cities.drawCities( [cities.coords[ind] for ind in [0]+simAnnSoln] )
 
     # Plot energy and temperature together
@@ -159,9 +161,9 @@ if __name__ == '__main__':
     # Seed the random number generator
     if len(sys.argv) > 1:
         tdc.setseed(int(sys.argv[1]))
-    else:        
+    else:
         tdc.setseed(7)
-    # Put 9 cities on a 15 x 15 grid    
+    # Put 9 cities on a 15 x 15 grid
     cities = tdc.grid_2d_cities(9,15,15)
-    
+
     main(cities)
